@@ -33,7 +33,9 @@ const {
 // < 16
 
 function exponencial(exp) {
-
+    return function(num){
+        return Math.pow(num,exp)
+    }
 }
 
 // ----- Recursión -----
@@ -49,9 +51,9 @@ function exponencial(exp) {
 //     S: { // direccion = "S"
 //         N: 'pared',
 //         S: 'pared',
-//         E: { // direccion = "SE"
+//         E: // direccion = "SE"
 //             N: 'destino', // direccion = "SEN"
-//             S: 'pared',
+//             S: 'pared', {
 //             E: 'pared',
 //             O: 'pared'
 //         },
@@ -70,7 +72,16 @@ function exponencial(exp) {
 // Aclaraciones: el segundo parametro que recibe la funcion ('direccion') puede ser pasado vacio (null)
 
 function direcciones(laberinto) {
-
+    let camino = ''
+    for(clave in laberinto){
+        if(laberinto[clave] === 'destino'){
+            return camino + clave;
+        }
+        else if(laberinto[clave] !== 'pared'){
+           camino = camino + clave + direcciones(laberinto[clave]);
+        }
+    }
+    return camino;
 }
 
 
@@ -88,7 +99,20 @@ function direcciones(laberinto) {
 // deepEqualArrays([0,1,[[0,1,2],1,2]], [0,1,[[0,1,2],1,2]]) => true
 
 function deepEqualArrays(arr1, arr2) {
-
+    let control = true;
+    if(arr1.length !== arr2.length){
+        return false;
+    }
+    for(var i = 0; i < arr1.length; i++){
+        if(Array.isArray(arr1[i]) && Array.isArray(arr2[i])){
+             control = deepEqualArrays(arr1[i],arr2[i]);
+      }
+        else if(arr1[i] !== arr2[i]){
+                 control = false;
+                break;
+            }   
+    }
+    return control;
 }
 
 
@@ -139,6 +163,23 @@ OrderedLinkedList.prototype.print = function(){
 // < 'head --> 5 --> 3 --> 1 --> null'
 //               4
 OrderedLinkedList.prototype.add = function(val){
+    let nodoNuevo = new Node(val);
+    if(!this.head){
+        this.head = nodoNuevo;
+    }
+    let current = this.head;
+    if(current.value < val){
+        this.head = nodoNuevo;
+        nodoNuevo.next = current;
+    }
+    else {
+        while(current.next && current.next.value > val){
+            current = current.next;
+        }
+        let aux = current.next;
+        current.next = nodoNuevo; 
+        nodoNuevo.next = aux;
+    }
     
 }
 
@@ -159,7 +200,12 @@ OrderedLinkedList.prototype.add = function(val){
 // < null
 
 OrderedLinkedList.prototype.removeHigher = function(){
-    
+    if(!this.head){
+        return null;
+    }
+    let result = this.head.value;
+    this.head = this.head.next;
+    return result;
 }
 
 
@@ -179,7 +225,21 @@ OrderedLinkedList.prototype.removeHigher = function(){
 // < null
 
 OrderedLinkedList.prototype.removeLower = function(){
-    
+    if(!this.head){
+        return null;
+    }
+    if(!this.head.next){
+        let res = this.head.value;
+        this.head = null;
+        return res;
+    }
+    let current = this.head;
+    while(current.next.next){
+        current = current.next;
+    }
+    result = current.next.value;
+    current.next = null;
+    return result;
 }
 
 
@@ -210,9 +270,27 @@ OrderedLinkedList.prototype.removeLower = function(){
 //   ];
 // > multiCallbacks(cbs1, cbs2);
 // < ["2-1", "1-1", "1-2", "2-2"];
-
+function bubbleSort(arrayArg) { 
+    let array = [...arrayArg];  
+    let aux;        
+    for(let i = 0; i < array.length; i++){
+      for(let j = 0; j < array.length -i-1; j++){ 
+        if(array[j].time > array[j+1].time){
+          aux = array[j];
+          array[j] = array[j+1]
+          array[j+1] = aux;
+        } 
+      }
+    } 
+    return array;
+  }
 function multiCallbacks(cbs1, cbs2){
-    
+    array = bubbleSort(cbs1.concat(cbs2));
+    arrayRes = []
+    for(var i = 0; i < array.length; i++){
+        arrayRes.push(array[i].cb());
+    }
+  return arrayRes;
 }
 
 
